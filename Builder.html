@@ -1,0 +1,385 @@
+<!doctype HTML>
+<head>
+<script src = "https://cdn.plot.ly/plotly-latest.min.js" ></script>
+<script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" ></script>
+<script>
+
+
+var pageData = [];
+
+
+function addNewElement() {
+    
+    //Insert a new child element to the document body with id as entered into the form by the user 
+    id      = document.getElementById( "insertId" ).value;
+    Element = document.getElementById( "insertType" ).value;
+    eNew    = document.createElement( Element );    
+    
+        eNew.id = id;
+        eNew.style.position = "absolute";
+        eNew.innerText = "id:" + id;
+    
+    document.body.appendChild( eNew );    
+    
+    //Add new element to array 
+    id = document.getElementById( "insertId" ).value ;
+    pageData.push( {"id":id,"type":"text","left":0,"top":0,"width":100,"height":100,"text":"id:"+id} );    
+    refreshIds();
+}
+
+
+
+
+function clearAll() {
+
+    panel = document.getElementById( 'panel' ).innerHTML;
+    document.body.innerHTML = "<div id=\"panel\">" + panel + "</div>";
+
+    refreshIds();
+}
+
+
+
+
+function cssColorOptions( cssCode ) {
+
+    id      = document.getElementById( "wrkId" ).value ;
+    cssVal  = document.getElementById( cssCode ).value;
+
+    switch ( cssCode ) {
+        case 'backgroundColor':
+                document.getElementById( id ).style.backgroundColor = cssVal;
+                for( i=0; i < pageData.length; i++ ) {
+                    if ( pageData[ i ].id == id ) {
+                         pageData[ i ].backgroundColor = cssVal;
+                        }
+                }
+                break;
+    }
+
+}
+
+
+
+
+function cssIncrementOptions( cssCode ) {
+    //38 up 40 down
+    if ( event.keyCode == 38 || event.keyCode == 40 ) {
+
+        if ( event.keyCode == 38 ) { inc =  1; }
+        if ( event.keyCode == 40 ) { inc = -1; }
+
+        id = document.getElementById( "wrkId" ).value ;
+        
+        cssVal  = document.getElementById( cssCode ).value;
+        cssVal  = cssVal * 1;
+        cssVal  = cssVal + inc;
+        
+        document.getElementById( cssCode ).value = cssVal;
+        
+        switch ( cssCode ) {
+            case 'left':
+                document.getElementById( id ).style.left = cssVal + "px";
+                for( i=0; i < pageData.length; i++ ) {
+                    if ( pageData[ i ].id == id ) {
+                         pageData[ i ].left = cssVal;
+                        }
+                }
+                break;
+            case "top":
+                document.getElementById( id ).style.top = cssVal + "px";
+                for( i=0; i < pageData.length; i++ ) {
+                    if ( pageData[ i ].id == id ) {
+                         pageData[ i ].top = cssVal;
+                        }
+                }
+                break;
+            case "width":
+                document.getElementById( id ).style.width = cssVal + "px";
+                for( i=0; i < pageData.length; i++ ) {
+                    if ( pageData[ i ].id == id ) {
+                         pageData[ i ].width = cssVal;
+                        }
+                }
+
+            break;
+            case "height":
+                document.getElementById( id ).style.height = cssVal + "px";
+                for(i=0; i < pageData.length; i++ ) {
+                    if (pageData[ i ].id == id) {
+                         pageData[ i ].height = cssVal;
+                        }
+                }
+
+            break;
+
+        }
+    }
+}
+
+
+
+
+function loadPage() {
+    //http://localhost/php/BI/UserFiles/firstTest.html
+    pageName = 'UserFiles/' + document.getElementById( "loadfileId" ).value + '.html';
+    alert( pageName );
+
+    loadCall = $.ajax( {type: 'POST',url: 'LoadFileToEditor.php', data: {PostFileName:'UserFiles/firstTest.html'}, dataType: 'text', async:false} );
+    alert( loadCall.responseText );
+    document.body.innerHTML = document.body.innerHTML + loadCall.responseText;
+}
+
+
+
+
+function loadIdValues() {
+
+    id = document.getElementById( "wrkId" ).value;
+    
+    for( i=0; i < pageData.length; i++ ) {
+        if( pageData[ i ].id == id ) {
+            document.getElementById( 'left' ).value   = pageData[ i ].left;
+            document.getElementById( 'top' ).value    = pageData[ i ].top;
+            document.getElementById( 'width' ).value  = pageData[ i ].width;
+            document.getElementById( 'height' ).value = pageData[ i ].height;
+
+            document.getElementById( 'backgroundColor' ).value = pageData[ i ].backgroundColor;
+            
+            if( pageData[i].type == "text" ) {
+                document.getElementById( 'text' ).value = pageData[ i ].text;
+            }
+        }
+    }
+}
+
+
+
+
+function plotNewBar( userTitle ){
+
+   id = document.getElementById( "wrkId" ).value ;
+   document.getElementById( id ).innerHTML = "";
+
+   var newdataX = prompt( 'enter X data comma delimited' );
+   var newdataY = prompt( 'enter Y data comma delimited' );  
+   
+   xdataAH=newdataX.split( "," );  
+   ydataAH=newdataY.split( "," );  
+   
+   console.debug( xdataAH );
+   
+   Plotly.newPlot( id, [{x:xdataAH,y:ydataAH,type:"bar","name":"fred"},{x:[1,2,3],y:[4,5,6],"name":"wilma",type:"bar"}],{title:userTitle} );  
+   
+   for( i=0; i < pageData.length; i++ ) {
+        if( pageData[ i ].id == id) {
+            pageData[ i ].type = "graph";
+        }
+   }
+} 
+
+
+
+
+ function plotNewLine( userTitle ){
+    
+   id = document.getElementById( "wrkId" ).value ;
+   document.getElementById( id ).innerHTML = "";
+   
+   var newdataX = prompt( 'enter X data comma delimited' );
+   var newdataY = prompt( 'enter Y data comma delimited' );  
+   
+   xdataAH = newdataX.split( "," );  
+   ydataAH = newdataY.split( "," );  
+   
+   Plotly.newPlot( id, [{x:xdataAH,y:ydataAH,type:"line"}],{title:userTitle} );  
+   
+   for( i=0; i < pageData.length; i++ ) {
+        if( pageData[ i ].id == id ) {
+            pageData[ i ].type = "graph";
+        }
+   }
+  }
+
+
+
+
+function refreshIds() {
+    
+    elName = document.getElementById( "wrkIdType" ).value;
+    els = document.getElementsByTagName( elName );
+    document.getElementById( "wrkId" ).innerHTML = "";
+    
+    for ( n = 0; n < els.length; n++ ) {
+        if ( els[ n ].id  != "panel" && els[ n ].id  != "" ) {
+            document.getElementById( "wrkId" ).innerHTML =
+            document.getElementById( "wrkId" ).innerHTML + "<option>" + els[ n ].id + "</option>";
+        }
+    }
+    loadIdValues();
+}
+
+
+
+
+function removeElement() {
+
+    toRemName = document.getElementById( "wrkId" ).value;
+    toRemObj  = document.getElementById( toRemName );
+    
+    document.body.removeChild( toRemObj );
+    refreshIds();
+}
+
+
+
+
+function savePage() {
+
+    filenameId = document.getElementById( "filenameId" ).value;
+    head = "<head>" + document.head.innerHTML + "</head>";
+    body = "";
+    
+    for  ( i=0; i < document.body.children.length; i++ ) {
+        if ( document.body.children[ i ].id != 'panel' ) {
+            body = body + document.body.children[ i ].outerHTML;
+        }
+    }
+    
+    page = "<html>" + head + "<body>" + body + "</body>" + "</html>";
+    console.debug( page );
+
+    x = $.ajax( {type: 'POST',url: 'SaveFile.php', data: {pageText:page,fileName:filenameId}, dataType: 'text', async:false} );
+
+    alert( x.responseText );
+
+}
+
+
+
+
+function updateText() {
+    
+    id = document.getElementById( "wrkId" ).value;
+    
+    for( i = 0 ; i < pageData.length; i++ ) {
+        if( pageData[ i ].id == id ) {
+            if( pageData[ i ].type == "text" ) {
+                text = document.getElementById( "text" ).value;
+                document.getElementById( id ).innerHTML = text;
+            }
+        }
+   }
+
+}
+
+
+
+
+function updatePageData( name, value ) {
+    elName = document.getElementById( "wrkId" ).value;
+    for ( n = 0; n < pageData.elid.length; n++ ) {
+        //pageData.elid[n].???=value;
+    }
+}
+
+
+</script>
+
+<style>
+    #panel {
+    position:absolute;
+    right:0px;
+    height:800px;
+    width:310px;
+    background-color:black;
+    color:white;
+}
+td {color:white;}
+//input {width:100px;}
+.ar {text-align:right;}
+.al {text-align:left;}
+</style>
+
+
+</head>
+<body>
+
+<div id="panel">
+    <table>
+        <tr>
+            <td>working id type</td>
+            <td><select id="wrkIdType">
+                    <option>div</option>
+                    <option>p</option>
+                    <option>script</option>
+                </select></td>
+        </tr>
+        <tr>
+            <td class="ar">id</td>
+            <td><select onchange="loadIdValues();" id="wrkId">
+                    <option>id01</option>
+                </select> <button onclick="removeElement()">remove</button></td>
+        </tr>
+
+        <tr>
+            <td>text </td>
+            <td><input id="text" onkeyup="updateText()" size="7" value=""></input></td>
+        </tr>
+
+        <tr>
+            <td>Add Graph</td>
+            <td><button onclick="plotNewBar('New Bar')">bar</button></td>
+        </tr>
+
+        <tr>
+            <td>left </td>
+            <td><input id="left" onkeydown="cssIncrementOptions('left')" size="4" value=0></input>px</td>
+        </tr>
+        <tr>
+            <td>top </td>
+            <td><input id="top" onkeydown="cssIncrementOptions('top')" size="4" value=0></input>px</td>
+        </tr>
+        <tr>
+            <td>width </td>
+            <td><input id="width" onkeydown="cssIncrementOptions('width')" size="4" value=100></input>px</td>
+        </tr>
+        <tr>
+            <td>height </td>
+            <td><input id="height" onkeydown="cssIncrementOptions('height')" size="4" value=100></input>px</td>
+        </tr>
+
+        <tr>
+            <td>background-color </td>
+            <td><input id="backgroundColor" onchange="cssColorOptions('backgroundColor')" size="7" value="#00FFCC"></input></td>
+        </tr>
+
+        <tr>
+            <td>add element</td>
+            <td><select id="insertType">
+                    <option>div</option>
+                    <option>p</option>
+                    <option>script</option>
+                </select></td>
+        </tr>
+        <tr>
+            <td class="ar">id</td>
+            <td><input id="insertId" type="text" size="5"></input> <button onclick="addNewElement()">Add</button></td>
+        </tr>
+        <tr>
+            <td class="ar">filename</td>
+            <td><input id="filenameId" type="text" size="5"></input> <button onclick="savePage()"">Save </button></td>
+        </tr>
+        <tr>
+            <td class="ar">load file</td>
+            <td><input id="loadfileId" type="text" size="5"></input> <button onclick="loadPage()">Load File </button></td>
+        </tr>
+
+        <tr>
+            <td class="ar">Empty Page</td>
+            <td><button onclick="clearAll()"">Clear All </button></td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>
